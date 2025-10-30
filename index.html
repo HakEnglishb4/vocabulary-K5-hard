@@ -28,14 +28,770 @@
 {
   "imports": {
     "react": "https://esm.sh/react@18.2.0",
-    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client"
   }
 }
 </script>
   </head>
   <body class="bg-sky-50 text-gray-800 antialiased">
     <div id="root"></div>
-    <script type="module" src="./index.tsx"></script>
+    <script type="module">
+      import React from 'react';
+      import ReactDOM from 'react-dom/client';
+
+      const { useState, useEffect, useMemo, useCallback, useRef } = React;
+
+      // Data from services/vocabulary.ts
+      const vocabularyData = [
+          // 1. TIẾNG VIỆT - VIETNAMESE - GRADE 5
+          {
+            title: "1. Vietnamese - Grade 5",
+            words: [
+              { english: "Synonym", vietnamese: "từ đồng nghĩa", englishExample: "Big is a synonym for large.", vietnameseExample: "Big là một từ đồng nghĩa của large." },
+              { english: "Similar", vietnamese: "tương tự", englishExample: "Her house is similar to mine.", vietnameseExample: "Nhà của cô ấy tương tự nhà của tôi." },
+              { english: "Opposite", vietnamese: "trái nghĩa", englishExample: "Hot is the opposite of cold.", vietnameseExample: "Nóng là trái nghĩa của lạnh." },
+              { english: "right", vietnamese: "quyền", englishExample: "Everyone has the right to speak.", vietnameseExample: "Mọi người đều có quyền phát biểu." },
+              { english: "pay tax", vietnamese: "nộp thuế", englishExample: "Good citizens always pay tax on time.", vietnameseExample: "Công dân tốt luôn nộp thuế đúng hạn." },
+              { english: "Dash", vietnamese: "dấu gạch ngang", englishExample: "Use a dash to connect the words.", vietnameseExample: "Sử dụng một dấu gạch ngang để nối các từ." },
+              { english: "willpower", vietnamese: "ý chí / nghị lực", englishExample: "You need strong willpower to finish the race.", vietnameseExample: "Bạn cần một ý chí mạnh mẽ để hoàn thành cuộc đua." },
+              { english: "Proverb", vietnamese: "tục ngữ", englishExample: "A common proverb says 'practice makes perfect'.", vietnameseExample: "Một câu tục ngữ phổ biến nói 'có công mài sắt có ngày nên kim'." },
+              { english: "Capitalization", vietnamese: "viết hoa", englishExample: "Remember capitalization for names and places.", vietnameseExample: "Hãy nhớ viết hoa cho tên và địa danh." },
+              { english: "original meaning", vietnamese: "nghĩa gốc", englishExample: "The word's original meaning has changed over time.", vietnameseExample: "Nghĩa gốc của từ đã thay đổi theo thời gian." },
+              { english: "transferred meaning", vietnamese: "nghĩa chuyển", englishExample: "The word 'star' can have a transferred meaning for a famous person.", vietnameseExample: "Từ 'ngôi sao' có thể có nghĩa chuyển để chỉ một người nổi tiếng." },
+              { english: "express opinions", vietnamese: "bày tỏ ý kiến", englishExample: "We can express opinions in the meeting.", vietnameseExample: "Chúng ta có thể bày tỏ ý kiến trong cuộc họp." },
+              { english: "Exclamation", vietnamese: "câu cảm thán", englishExample: "An exclamation often ends with an exclamation mark.", vietnameseExample: "Một câu cảm thán thường kết thúc bằng dấu chấm than." },
+              { english: "Period", vietnamese: "dấu chấm câu", englishExample: "Put a period at the end of the sentence.", vietnameseExample: "Đặt một dấu chấm câu ở cuối câu." }
+            ]
+          },
+          // 2. TOÁN - MATHS - GRADE 5
+          {
+            title: "2. Maths - Grade 5",
+            words: [
+              { english: "natural number", vietnamese: "số tự nhiên", englishExample: "Five is a natural number.", vietnameseExample: "Số năm là một số tự nhiên." },
+              { english: "sum", vietnamese: "tổng", englishExample: "The sum of two and three is five.", vietnameseExample: "Tổng của hai và ba là năm." },
+              { english: "Multiply", vietnamese: "Nhân", englishExample: "You need to multiply these two numbers.", vietnameseExample: "Bạn cần nhân hai số này." },
+              { english: "Divide", vietnamese: "Chia", englishExample: "Can you divide ten by two?", vietnameseExample: "Bạn có thể chia mười cho hai không?" },
+              { english: "subtract", vietnamese: "trừ", englishExample: "If you subtract two from five, you get three.", vietnameseExample: "Nếu bạn trừ hai từ năm, bạn được ba." },
+              { english: "add", vietnamese: "cộng", englishExample: "Let's add these numbers together.", vietnameseExample: "Hãy cộng những con số này lại với nhau." },
+              { english: "Equals", vietnamese: "bằng", englishExample: "Two plus two equals four.", vietnameseExample: "Hai cộng hai bằng bốn." },
+              { english: "average", vietnamese: "trung bình", englishExample: "The average score of the class was high.", vietnameseExample: "Điểm trung bình của cả lớp rất cao." },
+              { english: "fraction", vietnamese: "phân số", englishExample: "One half is a simple fraction.", vietnameseExample: "Một phần hai là một phân số đơn giản." },
+              { english: "larger", vietnamese: "lớn hơn", englishExample: "An elephant is larger than a mouse.", vietnameseExample: "Một con voi lớn hơn một con chuột." },
+              { english: "three quarters", vietnamese: "3/4", englishExample: "He ate three quarters of the pizza.", vietnameseExample: "Anh ấy đã ăn ba phần tư chiếc bánh pizza." },
+              { english: "one fifth", vietnamese: "1/5", englishExample: "I only want one fifth of the cake.", vietnameseExample: "Tôi chỉ muốn một phần năm của chiếc bánh." },
+              { english: "two fifths", vietnamese: "2/5", englishExample: "She painted two fifths of the wall.", vietnameseExample: "Cô ấy đã sơn hai phần năm của bức tường." },
+              { english: "zero point seven five", vietnamese: "0.75", englishExample: "The decimal zero point seven five is the same as three quarters.", vietnameseExample: "Số thập phân không phẩy bảy lăm cũng giống như ba phần tư." },
+              { english: "compare", vietnamese: "so sánh", englishExample: "Let's compare the two answers.", vietnameseExample: "Hãy so sánh hai câu trả lời." },
+              { english: "round", vietnamese: "làm tròn", englishExample: "Please round the number to the nearest ten.", vietnameseExample: "Vui lòng làm tròn số đến hàng chục gần nhất." },
+              { english: "square meter", vietnamese: "mét vuông", englishExample: "The room is twenty square meters.", vietnameseExample: "Căn phòng rộng hai mươi mét vuông." },
+              { english: "hectare", vietnamese: "héc-ta", englishExample: "The farm covers an area of ten hectares.", vietnameseExample: "Nông trại có diện tích mười héc-ta." }
+            ]
+          },
+          // 3. LỊCH SỬ & ĐỊA LÍ - HISTORY AND GEOGRAPHY - GRADE 5
+          {
+            title: "3. History & Geography - Grade 5",
+            words: [
+              { english: "located", vietnamese: "vị trí", englishExample: "The school is located near the park.", vietnameseExample: "Trường học có vị trí gần công viên." },
+              { english: "Southeast Asia", vietnamese: "Đông Nam Á", englishExample: "Vietnam is a country in Southeast Asia.", vietnameseExample: "Việt Nam là một quốc gia ở Đông Nam Á." },
+              { english: "Europe", vietnamese: "châu Âu", englishExample: "France and Germany are in Europe.", vietnameseExample: "Pháp và Đức ở châu Âu." },
+              { english: "Africa", vietnamese: "châu Phi", englishExample: "The Nile River is in Africa.", vietnameseExample: "Sông Nile ở châu Phi." },
+              { english: "border", vietnamese: "giáp với", englishExample: "Our country has a border with China.", vietnameseExample: "Nước ta có đường biên giới giáp với Trung Quốc." },
+              { english: "shape", vietnamese: "hình dạng", englishExample: "The shape of the table is a circle.", vietnameseExample: "Hình dạng của cái bàn là một hình tròn." },
+              { english: "territory", vietnamese: "lãnh thổ", englishExample: "The army protects the national territory.", vietnameseExample: "Quân đội bảo vệ lãnh thổ quốc gia." },
+              { english: "include", vietnamese: "bao gồm", englishExample: "The price will include breakfast.", vietnameseExample: "Giá sẽ bao gồm bữa sáng." },
+              { english: "land", vietnamese: "vùng đất", englishExample: "This is a large piece of land.", vietnameseExample: "Đây là một vùng đất rộng lớn." },
+              { english: "airspace", vietnamese: "vùng trời", englishExample: "The plane flew into protected airspace.", vietnameseExample: "Máy bay đã bay vào vùng trời được bảo vệ." },
+              { english: "merger", vietnamese: "sáp nhập", englishExample: "The two companies announced a merger.", vietnameseExample: "Hai công ty đã công bố việc sáp nhập." },
+              { english: "national flag", vietnamese: "quốc kỳ", englishExample: "The national flag of Vietnam is red and yellow.", vietnameseExample: "Quốc kỳ của Việt Nam có màu đỏ và vàng." },
+              { english: "yellow star", vietnamese: "sao vàng", englishExample: "There is a big yellow star on the flag.", vietnameseExample: "Có một ngôi sao vàng lớn trên lá cờ." },
+              { english: "national anthem", vietnamese: "quốc ca", englishExample: "We sing the national anthem every Monday.", vietnameseExample: "Chúng tôi hát quốc ca vào mỗi thứ Hai." },
+              { english: "archipelago", vietnamese: "quần đảo", englishExample: "The Philippines is a large archipelago.", vietnameseExample: "Philippines là một quần đảo lớn." },
+              { english: "belong to", vietnamese: "thuộc về", englishExample: "This book does not belong to me.", vietnameseExample: "Cuốn sách này không thuộc về tôi." },
+              { english: "ethnic groups", vietnamese: "dân tộc", englishExample: "Vietnam has 54 different ethnic groups.", vietnameseExample: "Việt Nam có 54 dân tộc khác nhau." },
+              { english: "population", vietnamese: "dân cư", englishExample: "The city has a large population.", vietnameseExample: "Thành phố có dân cư đông đúc." },
+              { english: "dense", vietnamese: "đông đúc", englishExample: "The forest is very dense with trees.", vietnameseExample: "Khu rừng rất rậm rạp cây cối." },
+              { english: "plains", vietnamese: "đồng bằng", englishExample: "Rice grows well in the flat plains.", vietnameseExample: "Lúa phát triển tốt ở các vùng đồng bằng phẳng." },
+              { english: "coastal areas", vietnamese: "vùng ven biển", englishExample: "Many people live in the coastal areas.", vietnameseExample: "Nhiều người sống ở các vùng ven biển." },
+              { english: "desert", vietnamese: "sa mạc", englishExample: "It is very hot and dry in the desert.", vietnameseExample: "Trời rất nóng và khô ở sa mạc." }
+            ]
+          },
+          // 4. ÂM NHẠC - MUSIC - GRADE 5
+          {
+            title: "4. Music - Grade 5",
+            words: [
+              { english: "My joy", vietnamese: "Niềm vui của em", englishExample: "Music is my joy and passion.", vietnameseExample: "Âm nhạc là niềm vui và đam mê của em." },
+              { english: "Sparkling", vietnamese: "lấp lánh, long lanh", englishExample: "Her eyes were sparkling with happiness.", vietnameseExample: "Đôi mắt cô ấy lấp lánh niềm hạnh phúc." },
+              { english: "Dewdrop", vietnamese: "giọt sương", englishExample: "A dewdrop fell from the leaf.", vietnameseExample: "Một giọt sương rơi từ chiếc lá." },
+              { english: "A dewdrop on a leaf", vietnamese: "Một giọt sương trên chiếc lá", englishExample: "I saw a dewdrop on a leaf this morning.", vietnameseExample: "Sáng nay tôi thấy một giọt sương trên chiếc lá." },
+              { english: "Sparkling dewdrop", vietnamese: "Hạt sương long lanh", englishExample: "The sparkling dewdrop looked like a diamond.", vietnameseExample: "Hạt sương long lanh trông như một viên kim cương." },
+              { english: "Sound", vietnamese: "âm thanh", englishExample: "The sound of the music was beautiful.", vietnameseExample: "Âm thanh của bản nhạc thật tuyệt vời." },
+              { english: "The sound of", vietnamese: "âm thanh của", englishExample: "I love the sound of the rain.", vietnameseExample: "Tôi yêu âm thanh của mưa." },
+              { english: "Move", vietnamese: "vận động, di chuyển", englishExample: "Please move your chair.", vietnameseExample: "Vui lòng di chuyển ghế của bạn." },
+              { english: "Moving", vietnamese: "đang di chuyển", englishExample: "The train is moving now.", vietnameseExample: "Tàu đang di chuyển." },
+              { english: "Stomp", vietnamese: "dậm, đạp", englishExample: "Don't stomp your feet like that.", vietnameseExample: "Đừng dậm chân như thế." },
+              { english: "Stomping feet", vietnamese: "dậm chân", englishExample: "The sound of stomping feet was loud.", vietnameseExample: "Tiếng dậm chân rất lớn." },
+              { english: "Melody", vietnamese: "giai điệu", englishExample: "The song has a beautiful melody.", vietnameseExample: "Bài hát có một giai điệu tuyệt đẹp." },
+              { english: "Instrument", vietnamese: "nhạc cụ", englishExample: "The piano is a musical instrument.", vietnameseExample: "Piano là một loại nhạc cụ." },
+              { english: "Musical instrument", vietnamese: "nhạc cụ (âm nhạc)", englishExample: "What musical instrument can you play?", vietnameseExample: "Bạn có thể chơi nhạc cụ nào?" },
+              { english: "Flute", vietnamese: "sáo", englishExample: "She plays the flute very well.", vietnameseExample: "Cô ấy chơi sáo rất hay." },
+              { english: "Drum", vietnamese: "trống", englishExample: "He is learning to play the drum.", vietnameseExample: "Anh ấy đang học chơi trống." },
+              { english: "Keyboard", vietnamese: "bàn phím / đàn phím điện tử", englishExample: "I use a keyboard to type on the computer.", vietnameseExample: "Tôi dùng bàn phím để gõ trên máy tính." },
+              { english: "Electronic keyboard", vietnamese: "đàn phím điện tử", englishExample: "My sister has a new electronic keyboard.", vietnameseExample: "Chị gái tôi có một chiếc đàn phím điện tử mới." }
+            ]
+          },
+          // 5. THỂ DỤC - PHYSICAL EDUCATION
+          {
+            title: "5. Physical Education",
+            words: [
+              { english: "Line", vietnamese: "Hàng dọc", englishExample: "Please stand in a straight line.", vietnameseExample: "Vui lòng đứng thành một hàng dọc thẳng." },
+              { english: "Vertical line", vietnamese: "Hàng dọc", englishExample: "Draw a vertical line on the paper.", vietnameseExample: "Vẽ một đường thẳng đứng trên giấy." },
+              { english: "Row", vietnamese: "Hàng ngang", englishExample: "We sat in the front row at the cinema.", vietnameseExample: "Chúng tôi ngồi ở hàng ghế đầu trong rạp chiếu phim." },
+              { english: "Horizontal line", vietnamese: "Hàng ngang", englishExample: "The horizon is a horizontal line.", vietnameseExample: "Đường chân trời là một đường ngang." },
+              { english: "Player", vietnamese: "Cầu thủ", englishExample: "He is a famous football player.", vietnameseExample: "Anh ấy là một cầu thủ bóng đá nổi tiếng." },
+              { english: "Formation", vietnamese: "Đội hình", englishExample: "The team practiced a new formation.", vietnameseExample: "Đội đã tập luyện một đội hình mới." }
+            ]
+          },
+          // 6. MĨ THUẬT - ART
+          {
+            title: "6. Art",
+            words: [
+              { english: "special", vietnamese: "đặc biệt", englishExample: "Today is a very special day.", vietnameseExample: "Hôm nay là một ngày rất đặc biệt." },
+              { english: "features", vietnamese: "đặc điểm", englishExample: "The new phone has many cool features.", vietnameseExample: "Chiếc điện thoại mới có nhiều đặc điểm thú vị." },
+              { english: "landscape", vietnamese: "phong cảnh", englishExample: "He painted a beautiful landscape.", vietnameseExample: "Ông ấy đã vẽ một bức tranh phong cảnh tuyệt đẹp." },
+              { english: "Bright sunshine and blue sky", vietnamese: "Ánh nắng rực rỡ và bầu trời xanh", englishExample: "We enjoyed the bright sunshine and blue sky.", vietnameseExample: "Chúng tôi tận hưởng ánh nắng rực rỡ và bầu trời xanh." },
+              { english: "Snow and ice", vietnamese: "Tuyết và băng", englishExample: "The road was covered in snow and ice.", vietnameseExample: "Con đường bị bao phủ bởi tuyết và băng." },
+              { english: "images", vietnamese: "hình ảnh", englishExample: "The book has many colorful images.", vietnameseExample: "Cuốn sách có nhiều hình ảnh đầy màu sắc." },
+              { english: "include", vietnamese: "bao gồm", englishExample: "The tour will include a visit to the museum.", vietnameseExample: "Chuyến tham quan sẽ bao gồm một chuyến thăm bảo tàng." },
+              { english: "Sea, sand and sunshine", vietnamese: "Biển, cát và ánh nắng", englishExample: "Our vacation was full of sea, sand and sunshine.", vietnameseExample: "Kỳ nghỉ của chúng tôi tràn ngập biển, cát và ánh nắng." },
+              { english: "Snowmen and snowflakes", vietnamese: "Người tuyết và bông tuyết", englishExample: "The drawing showed snowmen and snowflakes.", vietnameseExample: "Bức vẽ có người tuyết và những bông tuyết." },
+              { english: "traditional", vietnamese: "truyền thống", englishExample: "We wear traditional clothes on Tet holiday.", vietnameseExample: "Chúng tôi mặc quần áo truyền thống vào dịp Tết." },
+              { english: "costumes", vietnamese: "trang phục", englishExample: "The children wore beautiful costumes for the play.", vietnameseExample: "Các em bé mặc những bộ trang phục đẹp cho vở kịch." },
+              { english: "opinion", vietnamese: "ý kiến", englishExample: "What is your opinion on this matter?", vietnameseExample: "Ý kiến của bạn về vấn đề này là gì?" },
+              { english: "friendship", vietnamese: "tình bạn", englishExample: "Their friendship is very strong.", vietnameseExample: "Tình bạn của họ rất bền chặt." },
+              { english: "Sharing and helping each other", vietnamese: "Chia sẻ và giúp đỡ nhau", englishExample: "Sharing and helping each other makes us happy.", vietnameseExample: "Chia sẻ và giúp đỡ nhau làm chúng ta hạnh phúc." },
+              { english: "Fighting and shouting", vietnamese: "Cãi nhau và la hét", englishExample: "Fighting and shouting is not a good way to solve problems.", vietnameseExample: "Cãi nhau và la hét không phải là cách tốt để giải quyết vấn đề." },
+              { english: "Playing games together", vietnamese: "Chơi trò chơi cùng nhau", englishExample: "We enjoy playing games together.", vietnameseExample: "Chúng tôi thích chơi trò chơi cùng nhau." },
+              { english: "Fighting over toys", vietnamese: "Tranh giành đồ chơi", englishExample: "The little kids were fighting over toys.", vietnameseExample: "Những đứa trẻ nhỏ đang tranh giành đồ chơi." }
+            ]
+          },
+          // 7. TIN HỌC - INFORMATION TECHNOLOGY - GRADE 5
+          {
+            title: "7. Information Technology - Grade 5",
+            words: [
+              { english: "change colour", vietnamese: "thay đổi màu sắc", englishExample: "You can change colour of the text.", vietnameseExample: "Bạn có thể thay đổi màu sắc của văn bản." },
+              { english: "create", vietnamese: "tạo ra", englishExample: "I will create a new document.", vietnameseExample: "Tôi sẽ tạo ra một tài liệu mới." },
+              { english: "create a new page", vietnamese: "tạo trang mới", englishExample: "Let's create a new page for our project.", vietnameseExample: "Hãy tạo một trang mới cho dự án của chúng ta." },
+              { english: "create that character", vietnamese: "tạo ra nhân vật", englishExample: "You can create that character in the game.", vietnameseExample: "Bạn có thể tạo ra nhân vật đó trong trò chơi." },
+              { english: "character", vietnamese: "nhân vật", englishExample: "My favorite character is the hero.", vietnameseExample: "Nhân vật yêu thích của tôi là người hùng." },
+              { english: "software", vietnamese: "phần mềm", englishExample: "We need to install new software.", vietnameseExample: "Chúng ta cần cài đặt phần mềm mới." }
+            ]
+          },
+          // 8. CÔNG NGHỆ - TECHNOLOGY - GRADE 5
+          {
+            title: "8. Technology - Grade 5",
+            words: [
+              { english: "the product of Technology", vietnamese: "sản phẩm công nghệ", englishExample: "A smartphone is the product of Technology.", vietnameseExample: "Điện thoại thông minh là một sản phẩm công nghệ." },
+              { english: "the natural object", vietnamese: "đối tượng thiên nhiên", englishExample: "A tree is a natural object.", vietnameseExample: "Cây cối là một đối tượng thiên nhiên." },
+              { english: "means of transport", vietnamese: "Phương tiện giao thông", englishExample: "A car is a popular means of transport.", vietnameseExample: "Ô tô là một phương tiện giao thông phổ biến." },
+              { english: "calculator", vietnamese: "máy tính cầm tay", englishExample: "I use a calculator for math problems.", vietnameseExample: "Tôi sử dụng máy tính cầm tay cho các bài toán." },
+              { english: "Help to learn", vietnamese: "giúp học tập", englishExample: "Computers can help to learn new things.", vietnameseExample: "Máy tính có thể giúp học những điều mới." },
+              { english: "Help to play", vietnamese: "giúp vui chơi", englishExample: "Video games help to play and relax.", vietnameseExample: "Trò chơi điện tử giúp giải trí và thư giãn." },
+              { english: "Help to move", vietnamese: "giúp di chuyển", englishExample: "A bicycle can help to move around the city.", vietnameseExample: "Một chiếc xe đạp có thể giúp di chuyển quanh thành phố." }
+            ]
+          },
+          // 9. KỸ NĂNG SỐNG - LIFE SKILLS
+          {
+            title: "9. Life Skills",
+            words: [
+              { english: "Share", vietnamese: "chia sẻ", englishExample: "It is nice to share your toys with friends.", vietnameseExample: "Thật tốt khi chia sẻ đồ chơi của bạn với bạn bè." },
+              { english: "Personal information", vietnamese: "thông tin cá nhân", englishExample: "Never share personal information online.", vietnameseExample: "Đừng bao giờ chia sẻ thông tin cá nhân trên mạng." },
+              { english: "Password", vietnamese: "mật khẩu", englishExample: "You should have a strong password.", vietnameseExample: "Bạn nên có một mật khẩu mạnh." },
+              { english: "Upload", vietnamese: "tải lên", englishExample: "I need to upload my homework.", vietnameseExample: "Tôi cần tải lên bài tập về nhà của mình." },
+              { english: "download", vietnamese: "tải xuống", englishExample: "You can download the file from the website.", vietnameseExample: "Bạn có thể tải xuống tệp từ trang web." },
+              { english: "different ideas", vietnamese: "ý kiến khác nhau", englishExample: "We all have different ideas about the project.", vietnameseExample: "Tất cả chúng ta đều có những ý kiến khác nhau về dự án." },
+              { english: "Argue", vietnamese: "cãi nhau/ tranh luận", englishExample: "Please don't argue with your brother.", vietnameseExample: "Làm ơn đừng cãi nhau với anh trai của bạn." },
+              { english: "Sneer", vietnamese: "chế giễu", englishExample: "It is not kind to sneer at others.", vietnameseExample: "Chế giễu người khác là không tốt." },
+              { english: "Exchange ideas", vietnamese: "trao đổi ý kiến", englishExample: "Let's exchange ideas to find the best solution.", vietnameseExample: "Hãy trao đổi ý kiến để tìm ra giải pháp tốt nhất." },
+              { english: "Invite", vietnamese: "mời/ rủ", englishExample: "I will invite my friends to my birthday party.", vietnameseExample: "Tôi sẽ mời bạn bè đến dự tiệc sinh nhật của mình." },
+              { english: "Agree", vietnamese: "đồng ý", englishExample: "I agree with your idea.", vietnameseExample: "Tôi đồng ý với ý kiến của bạn." },
+              { english: "Curious", vietnamese: "tò mò", englishExample: "The cat was curious about the new box.", vietnameseExample: "Con mèo tò mò về chiếc hộp mới." },
+              { english: "Stranger", vietnamese: "người lạ", englishExample: "Don't talk to a stranger.", vietnameseExample: "Đừng nói chuyện với người lạ." }
+            ]
+          }
+        ];
+
+
+      // Components from components/
+      const SpeakerIcon = ({ className, ...props }) => React.createElement(
+        "svg",
+        Object.assign({
+          xmlns: "http://www.w3.org/2000/svg",
+          className: `h-8 w-8 ${className || ''}`,
+          fill: "none",
+          viewBox: "0 0 24 24",
+          stroke: "currentColor"
+        }, props),
+        React.createElement("path", {
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+          strokeWidth: 2,
+          d: "M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+        })
+      );
+
+      const TrophyIcon = ({ className, ...props }) => React.createElement(
+        "svg",
+        Object.assign({
+          xmlns: "http://www.w3.org/2000/svg",
+          className: `h-16 w-16 ${className || ''}`,
+          viewBox: "0 0 20 20",
+          fill: "currentColor"
+        }, props),
+        React.createElement("path", { fillRule: "evenodd", clipRule: "evenodd", d: "M17.92,3.39a1,1,0,0,0-1.33-.22L12,6.1,7.41,3.17a1,1,0,0,0-1.33.22L2.1,9.45a1,1,0,0,0,0,1.1l2.1,6.28a1,1,0,0,0,1,.67H14.8a1,1,0,0,0,1-.67l2.1-6.28a1,1,0,0,0,0-1.1ZM13,16H7L5.5,12,3,9.4,4.5,7.4l3,2.25a1,1,0,0,0,1,0l3-2.25L13,9.4,14.5,12Z" })
+      );
+
+      const WrongAnswersModal = ({ isOpen, onClose, mistakes, onPracticeMistakes }) => {
+        if (!isOpen) {
+          return null;
+        }
+
+        return React.createElement(
+          "div",
+          {
+            className: "fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50",
+            onClick: onClose
+          },
+          React.createElement(
+            "div",
+            {
+              className: "bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col",
+              onClick: (e) => e.stopPropagation()
+            },
+            React.createElement(
+              "div",
+              { className: "p-6 border-b border-gray-200 sticky top-0 bg-white" },
+              React.createElement("h2", { className: "text-2xl font-bold text-gray-800" }, "Words to Review"),
+              React.createElement("p", { className: "text-gray-500" }, "Here are the words you had trouble with.")
+            ),
+            React.createElement(
+              "div",
+              { className: "p-6 overflow-y-auto" },
+              mistakes.length === 0
+                ? React.createElement("p", { className: "text-center text-gray-500 py-8" }, "No mistakes yet. Great job!")
+                : React.createElement(
+                    "ul",
+                    { className: "divide-y divide-gray-200" },
+                    mistakes.map((mistake, index) =>
+                      React.createElement(
+                        "li",
+                        {
+                          key: index,
+                          className: "py-4 flex flex-col items-start select-none",
+                          onContextMenu: (e) => e.preventDefault()
+                        },
+                        React.createElement(
+                          "div",
+                          { className: "flex justify-between items-center w-full" },
+                          React.createElement("span", { className: "text-lg text-gray-800 font-medium" }, mistake.word.english),
+                          React.createElement("span", { className: "text-gray-600" }, mistake.word.vietnamese)
+                        ),
+                        mistake.sentenceErrorCount > 0 ?
+                          React.createElement("p", { className: "text-sm font-semibold text-red-600 mt-1" }, `Sentence mistakes: ${mistake.sentenceErrorCount}`) : null,
+                        mistake.word.englishExample ?
+                          React.createElement("p", { className: "text-xl text-gray-500 mt-1 italic" }, `e.g., "${mistake.word.englishExample}"`) : null
+                      )
+                    )
+                  )
+            ),
+            React.createElement(
+              "div",
+              { className: "p-6 border-t border-gray-200 sticky bottom-0 bg-white space-y-2" },
+               React.createElement(
+                "button",
+                {
+                  onClick: onPracticeMistakes,
+                  disabled: mistakes.length === 0,
+                  className: "w-full p-3 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                },
+                `Practice Mistakes (${mistakes.length})`
+              ),
+              React.createElement(
+                "button",
+                {
+                  onClick: onClose,
+                  className: "w-full p-3 bg-sky-500 text-white font-bold rounded-lg hover:bg-sky-600 transition-colors"
+                },
+                "Close"
+              )
+            )
+          )
+        );
+      };
+
+      const GameSummary = ({ score, total, onShowWrongAnswers, onNextTopic, onReturnToMenu, onPracticeMistakes, mistakesCount }) => {
+        return React.createElement(
+          "div",
+          { className: "flex flex-col items-center justify-center min-h-screen p-4" },
+          React.createElement(
+            "div",
+            { className: "w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 text-center border border-gray-200" },
+            React.createElement(
+              "div", { className: "flex justify-center text-sky-400 mb-4" },
+              React.createElement(TrophyIcon)
+            ),
+            React.createElement("h1", { className: "text-3xl font-bold text-sky-600 mb-2" }, "Topic Complete!"),
+            React.createElement("p", { className: "text-gray-600 mb-6" }, "Great job! Here's how you did."),
+            React.createElement(
+              "div", { className: "my-8" },
+              React.createElement("p", { className: "text-lg text-gray-800" }, "Your Score"),
+              React.createElement("p", { className: "text-6xl font-bold text-green-500" }, score, React.createElement("span", { className: "text-3xl text-gray-500" }, `/${total}`))
+            ),
+            React.createElement(
+              "div", { className: "space-y-3" },
+              React.createElement("button", { onClick: onNextTopic, className: "w-full p-4 bg-sky-500 text-white font-bold rounded-lg hover:bg-sky-600 transition-transform hover:scale-105 transform duration-200" }, "Continue to Next Topic"),
+              mistakesCount > 0 ? React.createElement("button", { onClick: onPracticeMistakes, className: "w-full p-4 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600 transition-transform hover:scale-105 transform duration-200" }, `Practice ${mistakesCount} Mistake(s)`) : null,
+              React.createElement("button", { onClick: onShowWrongAnswers, className: "w-full p-4 bg-gray-200 text-gray-800 font-bold rounded-lg hover:bg-gray-300 transition-transform hover:scale-105 transform duration-200" }, "Review Mistakes"),
+              React.createElement("button", { onClick: onReturnToMenu, className: "w-full p-3 bg-transparent text-gray-600 font-bold rounded-lg hover:bg-gray-100 transition-colors" }, "Back to Main Menu")
+            )
+          )
+        );
+      };
+
+      const Game = ({ topic, onReturnToMenu, onNextTopic, onStartPractice }) => {
+        const words = useMemo(() => [...topic.words].sort(() => 0.5 - Math.random()), [topic]);
+        
+        const [currentWordIndex, setCurrentWordIndex] = useState(0);
+        const [userInput, setUserInput] = useState('');
+        const [score, setScore] = useState(0);
+        const [attempts, setAttempts] = useState(1);
+        const [wrongAnswers, setWrongAnswers] = useState([]);
+        const [isFinished, setIsFinished] = useState(false);
+        const [showHint, setShowHint] = useState(false);
+        const [isHintVisible, setIsHintVisible] = useState(false);
+        const [showWrongAnswersModal, setShowWrongAnswersModal] = useState(false);
+        const [feedback, setFeedback] = useState(null);
+        const [gameStage, setGameStage] = useState('word');
+        const [isPreviewVisible, setIsPreviewVisible] = useState(false);
+        const inputRef = useRef(null);
+        const currentWord = words[currentWordIndex];
+
+        const getInputBorderColor = () => {
+            if (!feedback) return 'border-gray-300 focus:border-sky-500';
+            return feedback.type === 'correct' ? 'border-green-500 animate-pulse' : 'border-red-500 animate-pulse';
+        }
+
+        const speak = useCallback((text, onEndCallback = null) => {
+          if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            if (onEndCallback && typeof onEndCallback === 'function') {
+              utterance.onend = onEndCallback;
+            }
+            window.speechSynthesis.speak(utterance);
+          } else if (onEndCallback && typeof onEndCallback === 'function') {
+            onEndCallback();
+          }
+        }, []);
+
+        useEffect(() => {
+          if (currentWord) {
+            const textToSpeak = gameStage === 'word' ? currentWord.english : (currentWord.englishExample || '');
+
+            if (textToSpeak) {
+              setIsPreviewVisible(true);
+              const playSecondTimeAndHide = () => {
+                speak(textToSpeak, () => {
+                  setIsPreviewVisible(false);
+                  if (inputRef.current) inputRef.current.focus();
+                });
+              };
+              speak(textToSpeak, playSecondTimeAndHide);
+            } else {
+              setIsPreviewVisible(false);
+              if (inputRef.current) inputRef.current.focus();
+            }
+          }
+          return () => {
+            if ('speechSynthesis' in window) {
+              window.speechSynthesis.cancel();
+            }
+          };
+        }, [currentWord, gameStage, speak]);
+
+        useEffect(() => {
+            if (feedback) {
+                const timer = setTimeout(() => setFeedback(null), 2500);
+                return () => clearTimeout(timer);
+            }
+        }, [feedback]);
+
+        const normalizeSentence = (str) => str.trim().toLowerCase().replace(/[.,!?]/g, '').replace(/[\u2018\u2019']/g, "'");
+
+        const handleNextWord = useCallback(() => {
+          if (currentWordIndex < words.length - 1) {
+            setCurrentWordIndex(prev => prev + 1);
+            setUserInput('');
+            setAttempts(1);
+            setShowHint(false);
+            setFeedback(null);
+            setGameStage('word');
+          } else {
+            setIsFinished(true);
+          }
+        }, [currentWordIndex, words.length]);
+        
+        const handleTransitionToSentence = useCallback(() => {
+          if (currentWord.englishExample) {
+              setGameStage('sentence');
+              setUserInput('');
+              setFeedback(null);
+              setAttempts(1);
+              setShowHint(false);
+          } else {
+              handleNextWord();
+          }
+        }, [currentWord, handleNextWord]);
+
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          if (!userInput.trim() || feedback) return;
+
+          if (gameStage === 'word') {
+              const isCorrect = normalizeSentence(userInput) === normalizeSentence(currentWord.english);
+              if (isCorrect) {
+                setFeedback({type: 'correct', message: 'Correct!', example: currentWord.englishExample});
+                if (attempts === 1) {
+                  setScore(prev => prev + 1);
+                }
+                setTimeout(handleTransitionToSentence, 2500);
+              } else {
+                setFeedback({type: 'incorrect', message: 'Incorrect, try again!'});
+                if (attempts === 1) {
+                    setWrongAnswers(prev => {
+                        if (!prev.some(m => m.word.english === currentWord.english)) {
+                            return [...prev, { word: currentWord, sentenceErrorCount: 0 }];
+                        }
+                        return prev;
+                    });
+                }
+                setAttempts(prev => prev + 1);
+                if (attempts >= 1) {
+                  setShowHint(true);
+                }
+              }
+          } else { // gameStage === 'sentence'
+              if (!currentWord.englishExample) return;
+              
+              const isCorrect = normalizeSentence(userInput) === normalizeSentence(currentWord.englishExample);
+              if (isCorrect) {
+                  setFeedback({ type: 'correct', message: 'Excellent!' });
+                  setTimeout(handleNextWord, 1000);
+              } else {
+                  setFeedback({ type: 'incorrect', message: 'Not quite, listen again!' });
+                  setAttempts(prev => prev + 1);
+                  if (attempts >= 1) {
+                    setShowHint(true);
+                  }
+                  setWrongAnswers(prev => {
+                      const existingMistakeIndex = prev.findIndex(m => m.word.english === currentWord.english);
+                      if (existingMistakeIndex > -1) {
+                          const updatedMistakes = [...prev];
+                          updatedMistakes[existingMistakeIndex].sentenceErrorCount += 1;
+                          return updatedMistakes;
+                      } else {
+                          return [...prev, { word: currentWord, sentenceErrorCount: 1 }];
+                      }
+                  });
+              }
+          }
+        };
+
+        const handleListenAgain = useCallback(() => {
+            const textToSpeak = gameStage === 'word' ? currentWord.english : (currentWord.englishExample || '');
+            if (textToSpeak) {
+                setIsPreviewVisible(true);
+                speak(textToSpeak, () => {
+                    setIsPreviewVisible(false);
+                    if (inputRef.current) inputRef.current.focus();
+                });
+            }
+        }, [currentWord, gameStage, speak]);
+
+        const handlePracticeMistakes = () => {
+          if (wrongAnswers.length > 0) {
+            setShowWrongAnswersModal(false); // Close modal if it's open
+            onStartPractice(wrongAnswers);
+          }
+        };
+
+        if (isFinished) {
+          return React.createElement(React.Fragment, null,
+            React.createElement(GameSummary, { 
+              score, 
+              total: words.length, 
+              onShowWrongAnswers: () => setShowWrongAnswersModal(true), 
+              onNextTopic, 
+              onReturnToMenu,
+              onPracticeMistakes: handlePracticeMistakes,
+              mistakesCount: wrongAnswers.length 
+            }),
+            React.createElement(WrongAnswersModal, { 
+              isOpen: showWrongAnswersModal, 
+              onClose: () => setShowWrongAnswersModal(false), 
+              mistakes: wrongAnswers,
+              onPracticeMistakes: handlePracticeMistakes 
+            })
+          );
+        }
+
+        if (!currentWord) {
+          return React.createElement("div", { className: "text-center p-8" }, "Loading topic...");
+        }
+        
+        const progressPercentage = ((currentWordIndex) / words.length) * 100;
+
+        return React.createElement(
+          "div", { className: "flex flex-col items-center justify-center min-h-screen p-4" },
+          React.createElement(
+            "div", { className: "w-full max-w-xl bg-white rounded-2xl shadow-2xl p-6 md:p-8 relative overflow-hidden border border-gray-200" },
+            React.createElement("div", { className: "w-full bg-gray-200 rounded-full h-2.5 absolute top-0 left-0" },
+              React.createElement("div", { className: "bg-sky-400 h-2.5 rounded-full", style: { width: `${progressPercentage}%`, transition: 'width 0.5s ease-in-out' } })
+            ),
+            React.createElement("div", { className: "absolute top-4 left-4" },
+              React.createElement("button", { onClick: onReturnToMenu, className: "text-gray-500 hover:text-sky-600 transition-colors text-sm" }, "← Change Topic")
+            ),
+            React.createElement("div", { className: "absolute top-4 right-4" },
+              React.createElement("button", { onClick: () => setShowWrongAnswersModal(true), className: "text-gray-500 hover:text-sky-600 transition-colors text-sm" }, `Mistakes (${wrongAnswers.length})`)
+            ),
+            React.createElement("div", { className: "text-center mt-12" },
+              React.createElement("h2", { className: "text-2xl font-bold text-sky-600 mb-2" }, topic.title),
+              React.createElement("p", { className: "text-gray-500" }, `Word ${currentWordIndex + 1} of ${words.length} • Score: ${score}`)
+            ),
+            React.createElement("div", { className: "my-8 text-center min-h-[160px] flex flex-col justify-center items-center select-none", onContextMenu: (e) => e.preventDefault() },
+              isPreviewVisible
+                ? ( gameStage === 'word'
+                    ? React.createElement(React.Fragment, null,
+                        React.createElement("p", { className: "text-4xl md:text-5xl font-semibold text-sky-700 mb-2 animate-pulse" }, currentWord.english),
+                        React.createElement("p", { className: "text-lg text-gray-500" }, `(${currentWord.vietnamese})`)
+                      )
+                    : React.createElement(React.Fragment, null,
+                        React.createElement("p", { className: "text-2xl text-sky-700 mb-2 italic animate-pulse" }, `"${currentWord.englishExample}"`),
+                        React.createElement("p", { className: "text-lg text-gray-500" }, `(${currentWord.vietnameseExample})`)
+                      )
+                  )
+                : ( gameStage === 'word'
+                    ? React.createElement(React.Fragment, null,
+                        React.createElement("p", { className: "text-4xl md:text-5xl font-semibold text-gray-900 mb-2" }, currentWord.vietnamese),
+                        currentWord.vietnameseExample ? React.createElement("p", { className: "text-xl text-gray-500 mt-2 italic" }, `"${currentWord.vietnameseExample}"`) : null
+                      )
+                    : React.createElement(React.Fragment, null,
+                        React.createElement("p", { className: "text-2xl font-semibold text-gray-800 mb-2" }, "Listen and type the sentence:"),
+                        currentWord.vietnameseExample ? React.createElement("p", { className: "text-2xl text-gray-700 mb-2 italic" }, `"${currentWord.vietnameseExample}"`) : null,
+                        React.createElement("p", { className: "text-lg text-gray-500" }, `(${currentWord.english} - ${currentWord.vietnamese})`)
+                      )
+                  ),
+              React.createElement("button", { onClick: handleListenAgain, className: "text-gray-500 hover:text-sky-500 transition-colors p-2 rounded-full active:scale-90 transform mt-2" },
+                React.createElement(SpeakerIcon)
+              )
+            ),
+            React.createElement("form", { onSubmit: handleSubmit, className: "space-y-4" },
+              React.createElement("input", {
+                ref: inputRef,
+                type: "text",
+                value: userInput,
+                onChange: (e) => setUserInput(e.target.value),
+                placeholder: gameStage === 'word' ? "Type the English word..." : "Type the English sentence...",
+                className: `w-full p-4 text-center text-lg bg-gray-100 border-2 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all duration-200 ${getInputBorderColor()}`,
+                autoCapitalize: "none",
+                autoComplete: "off",
+                autoCorrect: "off"
+              }),
+              React.createElement("button", { type: "submit", className: "w-full p-4 bg-sky-500 text-white font-bold rounded-lg hover:bg-sky-600 transition-transform hover:scale-105 transform duration-200 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:scale-100" }, "Submit")
+            ),
+            React.createElement("div", { className: "mt-4 min-h-[48px] flex items-center justify-center" },
+                (showHint && !feedback) ? React.createElement("div", { className: "relative" },
+                  React.createElement("button", {
+                    onMouseDown: () => setIsHintVisible(true),
+                    onMouseUp: () => setIsHintVisible(false),
+                    onTouchStart: () => setIsHintVisible(true),
+                    onTouchEnd: () => setIsHintVisible(false),
+                    className: "px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
+                  }, "Hold for Hint"),
+                  isHintVisible ? React.createElement("div", { className: "absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white p-3 rounded-lg border border-gray-300 shadow-lg z-10 select-none" },
+                    React.createElement("p", { className: "text-sky-700 font-mono whitespace-nowrap" }, gameStage === 'word' ? currentWord.english : currentWord.englishExample)
+                  ) : null
+                ) : null,
+                feedback ? React.createElement(
+                  "div", 
+                  { className: "text-center" },
+                  React.createElement("p", { className: `text-lg font-semibold ${feedback.type === 'correct' ? 'text-green-500' : 'text-red-500'}` }, feedback.message),
+                  feedback.example ? React.createElement("p", { className: "text-lg text-gray-500 mt-1 italic" }, `e.g., "${feedback.example}"`) : null
+                ) : null
+            )
+          ),
+          React.createElement(WrongAnswersModal, { 
+            isOpen: showWrongAnswersModal, 
+            onClose: () => setShowWrongAnswersModal(false), 
+            mistakes: wrongAnswers,
+            onPracticeMistakes: handlePracticeMistakes 
+          })
+        );
+      };
+
+      // App component and its sub-components
+      const WelcomeScreen = ({ onNameSubmit }) => {
+          const [name, setName] = useState('');
+
+          const handleSubmit = (e) => {
+              e.preventDefault();
+              if (name.trim()) {
+                  onNameSubmit(name.trim());
+              }
+          };
+
+          return React.createElement(
+              "div",
+              { className: "flex flex-col items-center justify-center min-h-screen p-4 text-center" },
+              React.createElement(
+                  "div",
+                  { className: "w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-gray-200" },
+                  React.createElement("h1", { className: "text-4xl font-bold text-sky-600 mb-2" }, "Vocabulary Challenge"),
+                  React.createElement("p", { className: "text-gray-600 mb-8" }, "Enter your name to start learning!"),
+                  React.createElement(
+                      "form",
+                      { onSubmit: handleSubmit, className: "flex flex-col gap-4" },
+                      React.createElement("input", {
+                          type: "text",
+                          value: name,
+                          onChange: (e) => setName(e.target.value),
+                          placeholder: "Your Name",
+                          className: "w-full p-4 text-center text-lg bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200",
+                          maxLength: 20
+                      }),
+                      React.createElement(
+                          "button",
+                          {
+                              type: "submit",
+                              disabled: !name.trim(),
+                              className: "w-full p-4 bg-sky-500 text-white font-bold rounded-lg hover:bg-sky-600 transition-transform hover:scale-105 transform duration-200 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+                          },
+                          "Start Learning"
+                      )
+                  )
+              )
+          );
+      };
+
+      const topicColors = [
+        'bg-rose-100 border-rose-300 hover:bg-rose-200 text-rose-800 focus:ring-rose-500',
+        'bg-blue-100 border-blue-300 hover:bg-blue-200 text-blue-800 focus:ring-blue-500',
+        'bg-cyan-100 border-cyan-300 hover:bg-cyan-200 text-cyan-800 focus:ring-cyan-500',
+        'bg-amber-100 border-amber-300 hover:bg-amber-200 text-amber-800 focus:ring-amber-500',
+        'bg-violet-100 border-violet-300 hover:bg-violet-200 text-violet-800 focus:ring-violet-500',
+        'bg-fuchsia-100 border-fuchsia-300 hover:bg-fuchsia-200 text-fuchsia-800 focus:ring-fuchsia-500',
+        'bg-emerald-100 border-emerald-300 hover:bg-emerald-200 text-emerald-800 focus:ring-emerald-500',
+        'bg-sky-100 border-sky-300 hover:bg-sky-200 text-sky-800 focus:ring-sky-500',
+        'bg-lime-100 border-lime-300 hover:bg-lime-200 text-lime-800 focus:ring-lime-500',
+        'bg-orange-100 border-orange-300 hover:bg-orange-200 text-orange-800 focus:ring-orange-500',
+        'bg-teal-100 border-teal-300 hover:bg-teal-200 text-teal-800 focus:ring-teal-500',
+        'bg-indigo-100 border-indigo-300 hover:bg-indigo-200 text-indigo-800 focus:ring-indigo-500',
+        'bg-pink-100 border-pink-300 hover:bg-pink-200 text-pink-800 focus:ring-pink-500',
+        'bg-yellow-100 border-yellow-300 hover:bg-yellow-200 text-yellow-800 focus:ring-yellow-500',
+        'bg-green-100 border-green-300 hover:bg-green-200 text-green-800 focus:ring-green-500',
+      ];
+
+      const TopicSelector = ({ playerName, onSelectTopic }) => {
+        return React.createElement(
+          "div", { className: "flex flex-col items-center min-h-screen p-4" },
+          React.createElement(
+            "div", { className: "w-full max-w-6xl text-center py-8" },
+            React.createElement("h1", { className: "text-3xl md:text-4xl font-bold text-gray-800 mb-2" }, `Welcome, ${playerName}!`),
+            React.createElement("p", { className: "text-lg text-gray-600 mb-8" }, "Choose a topic to begin your challenge."),
+            React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" },
+              vocabularyData.map((topic, index) =>
+                React.createElement(
+                  "button",
+                  {
+                    key: index,
+                    onClick: () => onSelectTopic(topic),
+                    className: `p-4 rounded-lg shadow-md border hover:scale-105 transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-opacity-75 ${topicColors[index % topicColors.length]}`
+                  },
+                  React.createElement("h2", { className: "text-lg font-semibold" }, topic.title),
+                  React.createElement("p", { className: "mt-1 opacity-80" }, `${topic.words.length} words`)
+                )
+              )
+            )
+          )
+        );
+      };
+
+      const App = () => {
+        const [playerName, setPlayerName] = useState(() => localStorage.getItem('playerName') || '');
+        const [currentTopic, setCurrentTopic] = useState(null);
+        const [topicIndex, setTopicIndex] = useState(null);
+
+        const handleNameSubmit = useCallback((name) => {
+          localStorage.setItem('playerName', name);
+          setPlayerName(name);
+        }, []);
+
+        const handleSelectTopic = useCallback((topic) => {
+          const index = vocabularyData.findIndex(t => t.title === topic.title);
+          setCurrentTopic(topic);
+          setTopicIndex(index);
+        }, []);
+        
+        const handleReturnToMenu = useCallback(() => {
+            setCurrentTopic(null);
+            setTopicIndex(null);
+        }, []);
+
+        const handleNextTopic = useCallback(() => {
+          if (topicIndex !== null && topicIndex !== -1 && topicIndex < vocabularyData.length - 1) {
+              const nextIndex = topicIndex + 1;
+              setCurrentTopic(vocabularyData[nextIndex]);
+              setTopicIndex(nextIndex);
+          } else {
+              handleReturnToMenu();
+          }
+        }, [topicIndex, handleReturnToMenu]);
+
+        const handleStartPractice = useCallback((mistakes) => {
+          if (mistakes.length > 0) {
+              const practiceTopic = {
+                  title: "Practice Mistakes",
+                  words: mistakes.map(mistake => mistake.word)
+              };
+              setCurrentTopic(practiceTopic);
+              setTopicIndex(-1); // Use -1 to denote a practice session
+          }
+        }, []);
+
+        if (!playerName) {
+          return React.createElement(WelcomeScreen, { onNameSubmit: handleNameSubmit });
+        }
+
+        if (!currentTopic) {
+          return React.createElement(TopicSelector, { playerName, onSelectTopic: handleSelectTopic });
+        }
+
+        return React.createElement(Game, { 
+            topic: currentTopic, 
+            onReturnToMenu: handleReturnToMenu, 
+            onNextTopic: handleNextTopic,
+            onStartPractice: handleStartPractice
+        });
+      };
+
+      // Entry point from index.tsx
+      const rootElement = document.getElementById('root');
+      if (!rootElement) {
+        throw new Error("Could not find root element to mount to");
+      }
+
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(React.createElement(App));
+    </script>
   </body>
 </html>
