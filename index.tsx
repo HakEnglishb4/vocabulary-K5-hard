@@ -187,16 +187,16 @@ const vocabularyData = [
 
 // Components from components/
 // Fix: Modified SpeakerIcon to accept props to prevent type errors.
+// FIX: The original props object was causing a TypeScript error. Replaced with Object.assign to help with type inference.
 const SpeakerIcon = (props) => React.createElement(
   "svg",
-  {
-    ...(props || {}),
+  Object.assign({}, props, {
     xmlns: "http://www.w3.org/2000/svg",
     className: ["h-8 w-8", props && props.className].filter(Boolean).join(" "),
     fill: "none",
     viewBox: "0 0 24 24",
     stroke: "currentColor"
-  },
+  }),
   React.createElement("path", {
     strokeLinecap: "round",
     strokeLinejoin: "round",
@@ -206,15 +206,15 @@ const SpeakerIcon = (props) => React.createElement(
 );
 
 // Fix: Modified TrophyIcon to accept props to prevent type errors.
+// FIX: The original props object was causing a TypeScript error. Replaced with Object.assign to help with type inference.
 const TrophyIcon = (props) => React.createElement(
   "svg",
-  {
-    ...(props || {}),
+  Object.assign({}, props, {
     xmlns: "http://www.w3.org/2000/svg",
     className: ["h-16 w-16", props && props.className].filter(Boolean).join(" "),
     viewBox: "0 0 20 20",
     fill: "currentColor"
-  },
+  }),
   React.createElement("path", { fillRule: "evenodd", clipRule: "evenodd", d: "M17.92,3.39a1,1,0,0,0-1.33-.22L12,6.1,7.41,3.17a1,1,0,0,0-1.33.22L2.1,9.45a1,1,0,0,0,0,1.1l2.1,6.28a1,1,0,0,0,1,.67H14.8a1,1,0,0,0,1-.67l2.1-6.28a1,1,0,0,0,0-1.1ZM13,16H7L5.5,12,3,9.4,4.5,7.4l3,2.25a1,1,0,0,0,1,0l3-2.25L13,9.4,14.5,12Z" })
 );
 
