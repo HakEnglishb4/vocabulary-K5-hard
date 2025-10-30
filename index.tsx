@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -131,7 +132,7 @@ const vocabularyData = [
             { english: "costumes", vietnamese: "trang phục", englishExample: "The actors wore beautiful costumes for the play.", vietnameseExample: "Các diễn viên đã mặc những bộ trang phục đẹp cho vở kịch." },
             { english: "opinion", vietnamese: "ý kiến", englishExample: "In my opinion, this movie is very interesting.", vietnameseExample: "Theo ý kiến của tôi, bộ phim này rất thú vị." },
             { english: "friendship", vietnamese: "tình bạn", englishExample: "Their friendship started when they were in primary school.", vietnameseExample: "Tình bạn của họ bắt đầu khi họ còn học tiểu học." },
-            { english: "Sharing and helping each other", vietnamese: "Chia sẻ và giúp đỡ nhau", englishExample: "Sharing and helping each other is the key to a good friendship.", vietnameseExample: "Chia sẻ và giúp đỡ nhau là chìa khóa cho một tình bạn tốt đẹp." },
+            { english: "Sharing and helping each other", vietnamese: "Chia sẻ và giúp đỡ nhau", englishExample: "Sharing and helping each other is the key to a good friendship.", vietnameseExample: "Chia sẻ và giúp đỡ nhau là chì khóa cho một tình bạn tốt đẹp." },
             { english: "Fighting and shouting", vietnamese: "Cãi nhau và la hét", englishExample: "Fighting and shouting will not solve the problem.", vietnameseExample: "Cãi nhau và la hét sẽ không giải quyết được vấn đề." },
             { english: "Playing games together", vietnamese: "Chơi trò chơi cùng nhau", englishExample: "We enjoy playing games together after school.", vietnameseExample: "Chúng tôi thích chơi game cùng nhau sau giờ học." },
             { english: "Fighting over toys", vietnamese: "Tranh giành đồ chơi", englishExample: "The two little brothers were fighting over toys.", vietnameseExample: "Hai anh em nhỏ đang tranh giành đồ chơi." }
@@ -185,12 +186,13 @@ const vocabularyData = [
 
 
 // Components from components/
-const SpeakerIcon = () => React.createElement(
+// Fix: Modified SpeakerIcon to accept props to prevent type errors.
+const SpeakerIcon = (props) => React.createElement(
   "svg",
   {
+    ...(props || {}),
     xmlns: "http://www.w3.org/2000/svg",
-// FIX: Changed `className` to `class` to address the TypeScript error.
-    class: "h-8 w-8",
+    className: ["h-8 w-8", props && props.className].filter(Boolean).join(" "),
     fill: "none",
     viewBox: "0 0 24 24",
     stroke: "currentColor"
@@ -203,11 +205,13 @@ const SpeakerIcon = () => React.createElement(
   })
 );
 
-const TrophyIcon = () => React.createElement(
+// Fix: Modified TrophyIcon to accept props to prevent type errors.
+const TrophyIcon = (props) => React.createElement(
   "svg",
   {
+    ...(props || {}),
     xmlns: "http://www.w3.org/2000/svg",
-    className: "h-16 w-16",
+    className: ["h-16 w-16", props && props.className].filter(Boolean).join(" "),
     viewBox: "0 0 20 20",
     fill: "currentColor"
   },
@@ -536,8 +540,7 @@ const Game = ({ topic, onReturnToMenu, onNextTopic, onStartPractice }) => {
         isPreviewVisible
           ? ( gameStage === 'word'
               ? React.createElement(React.Fragment, null,
-// FIX: Changed `className` to `class` to address the TypeScript error.
-                  React.createElement("p", { class: "text-4xl md:text-5xl font-semibold text-sky-700 mb-2 animate-pulse" }, currentWord.english),
+                  React.createElement("p", { className: "text-4xl md:text-5xl font-semibold text-sky-700 mb-2 animate-pulse" }, currentWord.english),
                   React.createElement("p", { className: "text-lg text-gray-500" }, `(${currentWord.vietnamese})`)
                 )
               : React.createElement(React.Fragment, null,
@@ -567,7 +570,6 @@ const Game = ({ topic, onReturnToMenu, onNextTopic, onStartPractice }) => {
           value: userInput,
           onChange: (e) => setUserInput(e.target.value),
           placeholder: gameStage === 'word' ? "Type the English word..." : "Type the English sentence...",
-// FIX: Corrected typo in function call.
           className: `w-full p-4 text-center text-lg bg-gray-100 border-2 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all duration-200 ${getInputBorderColor()}`,
           autoCapitalize: "none",
           autoComplete: "off",
